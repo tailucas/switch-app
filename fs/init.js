@@ -16,16 +16,19 @@ GPIO.set_mode(led_pin, GPIO.MODE_OUTPUT);
 let switch1_pin = Cfg.get('app.switch_1.pin');
 let switch2_pin = Cfg.get('app.switch_2.pin');
 
+// pull GPIO low before setting output mode
+let switch1_value = 1;
+GPIO.write(switch1_pin, switch1_value);
+let switch2_value = 1;
+GPIO.write(switch2_pin, switch2_value);
+
 GPIO.set_mode(switch1_pin, GPIO.MODE_OUTPUT);
 GPIO.set_mode(switch2_pin, GPIO.MODE_OUTPUT);
 
-let switch1_value = 0;
-let switch2_value = 0;
-
 let device_id = Cfg.get('device.id');
-let mqtt_pub_topic = Cfg.get('app.mqtt_pub_topic')+'/state/'+device_id;
-let mqtt_sub_topic = Cfg.get('app.mqtt_sub_topic');
-let mqtt_heartbeat_topic = Cfg.get('app.mqtt_pub_topic')+'/heartbeat/'+device_id;
+let mqtt_pub_topic = Cfg.get('app.mqtt_topic')+'/state/'+device_id;
+let mqtt_sub_topic = Cfg.get('app.mqtt_topic')+'/control/'+device_id;
+let mqtt_heartbeat_topic = Cfg.get('app.mqtt_topic')+'/heartbeat/'+device_id;
 
 let sendMsg = function(topic, message) {
   let ok = MQTT.pub(topic, message, 1);
@@ -39,8 +42,6 @@ let sendMsg = function(topic, message) {
 };
 
 let pubMsg = function() {
-  switch1_value = GPIO.read(switch1_pin);
-  switch2_value = GPIO.read(switch2_pin);
   let message = JSON.stringify({
     uptime: Sys.uptime(),
     device_id: device_id,
@@ -58,8 +59,13 @@ MQTT.sub(mqtt_sub_topic, function(conn, topic, msg) {
     print(topic, '->', msg);
   }
   let obj = JSON.parse(msg);
-  GPIO.write(switch1_pin, obj.state[0]);
-  GPIO.write(switch2_pin, obj.state[1]);
+  if (debug) {
+    print(obj.state)
+  }
+  switch1_value = obj.state[0]
+  GPIO.write(switch1_pin, !switch1_value);
+  switch2_value = obj.state[1]
+  GPIO.write(switch2_pin, !switch2_value);
   pubMsg();
   // disable LED
   GPIO.write(led_pin, 0);

@@ -27,8 +27,7 @@ config_schema:
   - ["mqtt.enable", true]
   - ["rpc.mqtt.enable", false]  # Disable remote control over MQTT
   #- ["i2c.enable", true]
-  - ["app.mqtt_pub_topic", "s", "switch", {title: "MQTT topic for updates"}]
-  - ["app.mqtt_sub_topic", "s", "switch/control/#", {title: "MQTT topic for updates"}]
+  - ["app.mqtt_topic", "s", "switch", {title: "MQTT topic for updates"}]
   - ["app.debug", "b", false, {title: "Debug mode with additional console output"}]
   - ["app.heartbeat_pub_interval_s", "i", 10, {title: "Publish rate when idle"}]
   # GPIOs 34 to 39 are GPIs – input only pins. These pins don’t have internal pull-up or pull-down resistors.
