@@ -16,11 +16,14 @@ GPIO.set_mode(led_pin, GPIO.MODE_OUTPUT);
 let switch1_pin = Cfg.get('app.switch_1.pin');
 let switch2_pin = Cfg.get('app.switch_2.pin');
 
+let switch1_enabled = Cfg.get('app.switch_1.enabled');
+let switch2_enabled = Cfg.get('app.switch_2.enabled');
+
 // pull GPIO low before setting output mode
-let switch1_value = 1;
-GPIO.write(switch1_pin, switch1_value);
-let switch2_value = 1;
-GPIO.write(switch2_pin, switch2_value);
+let switch1_value = 0;
+GPIO.write(switch1_pin, !switch1_value);
+let switch2_value = 0;
+GPIO.write(switch2_pin, !switch2_value);
 
 GPIO.set_mode(switch1_pin, GPIO.MODE_OUTPUT);
 GPIO.set_mode(switch2_pin, GPIO.MODE_OUTPUT);
@@ -62,10 +65,14 @@ MQTT.sub(mqtt_sub_topic, function(conn, topic, msg) {
   if (debug) {
     print(obj.state)
   }
-  switch1_value = obj.state[0]
-  GPIO.write(switch1_pin, !switch1_value);
-  switch2_value = obj.state[1]
-  GPIO.write(switch2_pin, !switch2_value);
+  if (switch1_enabled) {
+    switch1_value = obj.state[0]
+    GPIO.write(switch1_pin, !switch1_value);
+  }
+  if (switch2_enabled) {
+    switch2_value = obj.state[1]
+    GPIO.write(switch2_pin, !switch2_value);
+  }
   pubMsg();
   // disable LED
   GPIO.write(led_pin, 0);
