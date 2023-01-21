@@ -19,6 +19,8 @@ let switch2_pin = Cfg.get('app.switch_2.pin');
 let switch1_enabled = Cfg.get('app.switch_1.enabled');
 let switch2_enabled = Cfg.get('app.switch_2.enabled');
 
+let switch_inverted = Cfg.get('app.relay.inverted');
+
 // pull GPIO low before setting output mode
 let switch1_value = 0;
 GPIO.write(switch1_pin, !switch1_value);
@@ -67,11 +69,23 @@ MQTT.sub(mqtt_sub_topic, function(conn, topic, msg) {
   }
   if (switch1_enabled) {
     switch1_value = obj.state[0]
-    GPIO.write(switch1_pin, !switch1_value);
+    if (switch_inverted) {
+      // only invert the output to GPIO, not the stored state
+      GPIO.write(switch1_pin, switch1_value);
+    } else {
+      // default is to invert logic for ESP32 GPIO
+      GPIO.write(switch1_pin, !switch1_value);
+    }
   }
   if (switch2_enabled) {
     switch2_value = obj.state[1]
-    GPIO.write(switch2_pin, !switch2_value);
+    if (switch_inverted) {
+      // only invert the output to GPIO, not the stored state
+      GPIO.write(switch2_pin, switch2_value);
+    } else {
+      // default is to invert logic for ESP32 GPIO
+      GPIO.write(switch2_pin, !switch2_value);
+    }
   }
   pubMsg();
   // disable LED

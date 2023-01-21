@@ -32,6 +32,7 @@ config_schema:
   - ["app.heartbeat_pub_interval_s", "i", 10, {title: "Publish rate when idle"}]
   # GPIOs 34 to 39 are GPIs – input only pins. These pins don’t have internal pull-up or pull-down resistors.
   # https://randomnerdtutorials.com/esp32-pinout-reference-gpios/
+  - ["app.relay.inverted", "b", true, {title: "Invert on/off logic."}]
   - ["app.switch_1.pin", "i", 32, {title: "GPIO switch pin"}]
   - ["app.switch_1.enabled", "b", true, {title: "Switch responds to MQTT commands."}]
   - ["app.switch_2.pin", "i", 33, {title: "GPIO switch pin"}]
